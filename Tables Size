@@ -20,7 +20,7 @@ SELECT table, formatReadableSize(size) as size, rows, days, formatReadableSize(a
     GROUP BY table
     ORDER BY rows DESC);
     
-    SELECT table, formatReadableSize(size) as size, rows, days, formatReadableSize(avgDaySize) as avgDaySize FROM (
+SELECT table, formatReadableSize(size) as size, rows, days, formatReadableSize(avgDaySize) as avgDaySize, formatReadableSize(avgRowSize) awgRowSize FROM (
     SELECT
         table,
         sum(bytes) AS size,
@@ -28,7 +28,8 @@ SELECT table, formatReadableSize(size) as size, rows, days, formatReadableSize(a
         min(min_time) AS min_time,
         max(max_time) AS max_time,
         toUInt32((max_time - min_time) / 86400) AS days,
-        size / ((max_time - min_time) / 86400) AS avgDaySize
+        size / ((max_time - min_time) / 86400) AS avgDaySize,
+        size / rows as avgRowSize
     FROM system.parts
     WHERE active
     GROUP BY table
