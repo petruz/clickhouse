@@ -1,0 +1,36 @@
+SELECT table,
+    formatReadableSize(sum(bytes)) as size,
+    min(min_date) as min_date,
+    max(max_date) as max_date
+    FROM system.parts
+    WHERE active
+GROUP BY table;
+
+SELECT table, formatReadableSize(size) as size, rows, days, formatReadableSize(avgDaySize) as avgDaySize FROM (
+    SELECT
+        table,
+        sum(bytes) AS size,
+        sum(rows) AS rows,
+        min(min_date) AS min_date,
+        max(max_date) AS max_date,
+        (max_date - min_date) AS days,
+        size / (max_date - min_date) AS avgDaySize
+    FROM system.parts
+    WHERE active
+    GROUP BY table
+    ORDER BY rows DESC);
+    
+    SELECT table, formatReadableSize(size) as size, rows, days, formatReadableSize(avgDaySize) as avgDaySize FROM (
+    SELECT
+        table,
+        sum(bytes) AS size,
+        sum(rows) AS rows,
+        min(min_time) AS min_time,
+        max(max_time) AS max_time,
+        toUInt32((max_time - min_time) / 86400) AS days,
+        size / ((max_time - min_time) / 86400) AS avgDaySize
+    FROM system.parts
+    WHERE active
+    GROUP BY table
+    ORDER BY rows DESC);
+
